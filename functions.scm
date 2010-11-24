@@ -14,7 +14,7 @@
 (define lat?
   (lambda (L)
     (cond
-      ((null? L) 
+      ((null? L) ; is L empty?
        #t)
       ((atom? (car L)) 
        (lat? (cdr L)))
@@ -518,7 +518,7 @@
     )
   )
 
-; a simpler version I wrote. I removed the multiple conds and elses, and asked if it wasa cons pair (list) instead of an atom.
+; a simpler version I wrote. I removed the multiple conds and elses, and asked if it was a cons pair (list) instead of an atom.
 ; atom? asks null? and pair? and the bigger insertR* has already asked null?, so this saves repeated computation.
 ; inserts new to the right of all occurrences of old in L
 (define insertR*
@@ -540,6 +540,7 @@
   )
 
 ; appends a at the end of lat
+; opposite of cons :)
 (define snoc
   (lambda (lat a)
     (cond
@@ -593,12 +594,12 @@
   (lambda (a L)
     (cond
       ((null? (car L))
-       0)
+       0)			; degenerate case 0
       ((pair? (car L))
        (+ (occur* a (car L))
           (occur* a (cdr L))))
       ((eq? (car L) a)
-       (+ 1 (occur* a (cdr L))))
+       (+ 1 (occur* a (cdr L)))); inductiive step 1
       (occur* a (cdr L))
       )
     )
@@ -666,3 +667,15 @@
       )
     )
   )
+
+; finds the left most atom in a non-empty list
+(define (leftmost L)
+  (cond
+    ((atom? (car L) (car L)))
+    (else (leftmost (car L)))))
+
+(define (eqlist? l1 l2)
+  (cond
+    ((and (null? l1) (null? l2)) #t)
+    ((and (null? l1) (atom? (car l2))) #f)
+    ((null? l1) #f)
