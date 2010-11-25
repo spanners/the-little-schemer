@@ -679,4 +679,31 @@
 
 ; chapter 6
 
+; asks if aexp is a numbered expression
+; the expression is in infix notation, e.g.
+; ((1 + 2) * 3) -> #t
+(define (numbered? aexp)
+  (cond
+    ((atom? aexp) (number? aexp))
+    (else
+      (and (numbered? (car aexp))
+	   (numbered? (car (cdr (cdr aexp))))))))
 
+(define (first-sub-exp aexp)
+  (car aexp))
+(define (second-sub-exp aexp)
+  (car (cdr (cdr aexp))))
+(define (operator aexp)
+  (car (cdr aexp)))
+(define (value nexp)
+  (cond
+    ((atom? nexp) nexp)
+    ((eq? (operator nexp) '+)
+    (+ (value (first-sub-exp nexp)) 
+       (value (second-sub-exp nexp))))
+    ((eq? (operator nexp) '*)
+    (* (value (first-sub-exp nexp)) 
+       (value (second-sub-exp nexp))))
+    ((eq? (operator nexp) '^)
+    (expt (value (first-sub-exp nexp)) 
+       (value (second-sub-exp nexp))))
