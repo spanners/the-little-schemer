@@ -1,13 +1,8 @@
 ; asks if x is an atom
 ; returns boolean
-(define atom?
-  (lambda (x)
-    (and 
-      (not (pair? x)) 
-      (not (null? x))
-      )
-    )
-  )
+(define (atom? x)
+  (and (not (pair? x)) 
+       (not (null? x))))
 
 ; asks if list L is a list of atoms [lat]
 ; returns boolean
@@ -408,23 +403,13 @@
 ; determines if two atoms are the same
 ; true if same
 ; false otherwise
-(define eqan?
-  (lambda (a1 a2)
-    (cond
-      ((and 
-         (number? a1)
-         (number? a2))
-       (= a1 a2))
-      ((or
-         (number? a1)
-         (number? a2))
-       #f)
-      (else
-        (eq? a1 a2)
-        )
-      )
-    )
-  )
+(define (eqan? a1 a2)
+  (cond
+    ((and (number? a1) (number? a2))
+     (= a1 a2))
+    ((or (number? a1) (number? a2)) 
+     #f)
+    (else (eq? a1 a2))))
 
 ; counts the number of times a occurs in lat
 (define occur
@@ -674,20 +659,24 @@
     ((atom? (car L) (car L)))
     (else (leftmost (car L)))))
 
+; determines if two S-expressions s1 and s2 are the same
+; an S-expression is an atom or a (possibly empty) list of S-expressions
+(define (areequal? s1 s2)
+  (cond
+    ((and (atom? s1) (atom? s2))
+     (eqan? s1 s2))
+    ((or (atom? s1) (atom? s2)) #f)
+    (else (eqlist? s1 s2))))
+
+; determins if two lists l1 and l2 are the same (uses areequal?)
 (define (eqlist? l1 l2)
   (cond
-    ((and (null? l1) (null? l2)) #t) 		; both reduced to null.. so equal
-    ((and (null? l1) (atom? (car l2))) #f)
-    ((null? l1) #f)				; if only one is null.. unequal
-    ((and (atom? (car l1)) (null? l2)) #f)
-    ((and (atom? (car l1)) (atom? (car l2)))
-     (and (eqan? (car l1) (car l2))		; if first of each are equal atoms, find out if rest are
-	  (eqlist? (cdr l1) (cdr l2))))
-    ((atom? (car l1)) #f)			;hmm..
-    ((null? l2) #f)
-    (atom? (car l2) #f)
+    ((and (null? l1) (null? l2)) #t)
+    ((or (null? l1) (null? l2)) #f)
     (else
-      (and (eqlist? (car l1) (car l2))		; we have two cons pairs as cars. check if first of each and rest are equal
+      (and (areequal? (car l1) (car l2))
 	   (eqlist? (cdr l1) (cdr l2))))))
+
+; chapter 6
 
 
