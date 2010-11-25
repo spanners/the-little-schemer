@@ -676,6 +676,18 @@
 
 (define (eqlist? l1 l2)
   (cond
-    ((and (null? l1) (null? l2)) #t)
+    ((and (null? l1) (null? l2)) #t) 		; both reduced to null.. so equal
     ((and (null? l1) (atom? (car l2))) #f)
-    ((null? l1) #f)
+    ((null? l1) #f)				; if only one is null.. unequal
+    ((and (atom? (car l1)) (null? l2)) #f)
+    ((and (atom? (car l1)) (atom? (car l2)))
+     (and (eqan? (car l1) (car l2))		; if first of each are equal atoms, find out if rest are
+	  (eqlist? (cdr l1) (cdr l2))))
+    ((atom? (car l1)) #f)			;hmm..
+    ((null? l2) #f)
+    (atom? (car l2) #f)
+    (else
+      (and (eqlist? (car l1) (car l2))		; we have two cons pairs as cars. check if first of each and rest are equal
+	   (eqlist? (cdr l1) (cdr l2))))))
+
+
