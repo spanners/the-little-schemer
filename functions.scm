@@ -668,7 +668,7 @@
     ((or (atom? s1) (atom? s2)) #f)
     (else (eqlist? s1 s2))))
 
-; determins if two lists l1 and l2 are the same (uses areequal?)
+; determines if two lists l1 and l2 are the same (uses areequal?)
 (define (eqlist? l1 l2)
   (cond
     ((and (null? l1) (null? l2)) #t)
