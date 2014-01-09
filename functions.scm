@@ -326,25 +326,29 @@
 ; finds length of lat
 (define len
   (lambda (lat)
-    ((null? lat)
-     0)
-    (else
-      (add1 (len (cdr lat)))
-      )
-    )
-  )
+    (cond
+      ((null? lat)
+       0)
+      (else
+        (add1 (len (cdr lat)))
+       )
+     )
+   )
+ )
 
 ; picks the nth element in lat, indexed from 1
 (define pick
   (lambda (n lat)
-    ((zero? (sub1 n)
+    (cond
+      ((zero? (sub1 n))
             (car lat))
-     (else
-       (pick (sub1 n) (cdr lat))
-       )
-     )
+       (else
+         (pick (sub1 n) (cdr lat))
+        )
+      )
     )
   )
+  
 
 ; removes nth element from lat, indexed from 1
 (define rempick
@@ -656,7 +660,7 @@
 ; finds the left most atom in a non-empty list
 (define (leftmost L)
   (cond
-    ((atom? (car L) (car L)))
+    ((atom? (car L)) (car L))
     (else (leftmost (car L)))))
 
 ; determines if two S-expressions s1 and s2 are the same
@@ -691,10 +695,13 @@
 
 (define (first-sub-exp aexp)
   (car aexp))
+
 (define (second-sub-exp aexp)
   (car (cdr (cdr aexp))))
+
 (define (operator aexp)
   (car (cdr aexp)))
+
 (define (value nexp)
   (cond
     ((atom? nexp) nexp)
@@ -706,4 +713,4 @@
        (value (second-sub-exp nexp))))
     ((eq? (operator nexp) '^)
     (expt (value (first-sub-exp nexp)) 
-       (value (second-sub-exp nexp))))
+       (value (second-sub-exp nexp))))))
