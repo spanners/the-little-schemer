@@ -714,3 +714,31 @@
     ((eq? (operator nexp) '^)
     (expt (value (first-sub-exp nexp)) 
        (value (second-sub-exp nexp))))))
+
+; THE EIGHTH COMMANDMENT : Use help functions to abstract from representations
+
+
+; Oh man Church numerals
+
+; So here we define zero to be '()
+(define sero?
+  (lambda (n)
+    (null? n)))
+
+; This is our church numeral successor function
+(define edd1
+  (lambda (n)
+    (cons (quote ()) n)))
+
+; Likewise for subtraction
+(define zub1
+  (lambda (n)
+    (cdr n)))
+
+; Plus
+(define ples
+  (lambda (n m)
+    (cond
+      ((sero? m) n)
+      (else
+	(edd1 (ples n (zub1 m)))))))
