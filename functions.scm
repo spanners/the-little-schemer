@@ -742,3 +742,237 @@
       ((sero? m) n)
       (else
 	(edd1 (ples n (zub1 m)))))))
+
+; Q. Recall `lat?`
+; A.
+; asks if list L is a list of atoms [lat]
+; returns boolean
+(define lat?
+  (lambda (L)
+    (cond
+      ((null? L) ; is L empty?
+       #t)
+      ((atom? (car L)) 
+       (lat? (cdr L)))
+      (else 
+        #f)
+      )
+    )
+  )
+
+; Q. Do you remember what the value of (lat? ls) is where ls is (1 2 3)
+; A. #t, of course.
+
+; Q. What is (1 2 3) with our new numbers?
+; A.
+(define one-two-three
+  '((()) (()()) (()()()))
+  )
+
+; Q. What is (lat ls?) where ls is ((()) (()()) (()()()))
+; A. It is very false.
+;
+; In other words, (atom? '(())) --> #f.
+
+; Q. Is that bad?
+; A. You must beware of shadows.
+;
+; Well that's great, Friedman and Felleisen. But what does that mean?
+;
+; From http://groups.yahoo.com/neo/groups/sicp-vsg/conversations/topics/233
+;
+; By Pascal Bourguignon
+;
+;
+; When you're abstracting you must be careful not to use functions from
+; different layers. You don't use an electronic microscope to lay
+; bricks in a wall. But you could use an electronic microscope to build
+; molecules that you'd use to make the cement used to found the bricks
+; you'll use to build the wall.
+;
+;
+; So, the atom? I defined, in term of pair? is a function that works at
+; the level of the conses we manipulate with the interpreter at hand.
+;
+; If you use these conses to build higher level abstractions, such as
+; numbers, characters, strings and symbols, and high level conses, then
+; you'll need a way to distinguish these different kinds of object, and
+; you'll need an higher level high-atom? function.
+;
+; Let me paste thereafter some Common-Lisp code I have that will
+; illustrate the point.
+;
+; (cl:let ((zero (minimal-lisp-user::|0|)))
+; (cl:list (cl:atom zero) (minimal-lisp-user::atom zero)))
+; --> (NIL T)
+;
+; The same object isn't an atom at the implementation level, but is an
+; atom at the higher abstraction level. The first atom is cl:atom, the
+; second is minimal-lisp-user::atom.
+;
+;
+; Also, remember that lisp plays tricks already with conses and lists:
+; lists are implemented with conses, and a list object is referenced by
+; its first cons. This allows "clever" tricks such as applying cons
+; functions to lists or lists functions to conses. But you have to be
+; careful, because a list function applied to a cons that belongs to a
+; tree or another kind of data structure may give surprizing results.
+; (Try to use a list function on a circular list or a dotted-list).
+; It's better to distinguish the two abstraction level, and use
+; car/cdr/null with cons+nil and first/rest/endp with lists (or scheme's
+; car/cdr/null? and first/rest/ it doesn't have end? !?). And if you
+; use lists to implement trees, you'd rather use tree-node and
+; tree-children rather than first and rest.
+;
+;
+;
+;
+; (defpackage :minimal-lisp
+; (:nicknames :ml)
+; (:import-from :common-lisp :car :cdr :cons :quote :eq :cond :defun)
+; (:export :car :cdr :cons :quote :eq :cond :defun))
+;
+; (defpackage :minimal-lisp-user
+; (:nicknames :mlu)
+; (:use :minimal-lisp))
+;
+; (in-package :minimal-lisp-user)
+;
+; ;; From here on, we only have the minimal set of primitives:
+; ;; car cdr cons quote eq cond defun
+;
+; (defun make-integer (value) (cons (quote (())) value))
+; (defun make-char (value) (cons (quote ((()))) value))
+; (defun make-string (value) (cons (quote (((())))) value))
+; (defun make-cons (value) (cons (quote ((((()))))) value))
+; (defun make-symbol (value) (cons (quote (((((())))))) value))
+;
+; (defun get-value (tagged-value) (cdr tagged-value))
+; (defun get-tag (tagged-value) (car tagged-value))
+;
+; (defun integerp (tagged-value) (eq (get-tag (make-integer nil))
+;   (get-tag tagged-value)))
+; (defun charp (tagged-value) (eq (get-tag (make-char nil))
+;   (get-tag tagged-value)))
+; (defun stringp (tagged-value) (eq (get-tag (make-string nil))
+;   (get-tag tagged-value)))
+; (defun consp (tagged-value) (eq (get-tag (make-cons nil))
+;   (get-tag tagged-value)))
+; (defun symbolp (tagged-value) (eq (get-tag (make-symbol nil))
+;   (get-tag tagged-value)))
+; (defun atom (tagged-value) (not (consp tagged-value)))
+;
+; (defun t () (quote (())))
+; (defun nil () (quote ()))
+; (defun null (a) (eq (nil) a))
+; (defun and (a b) (cond (a b) ((nil))))
+; (defun or (a b) (cond (a a) (b b)))
+; (defun not (a) (cond (a (nil)) ((t))))
+; (defun equiv (a b)
+;   (or (and (null a) (null b)) 
+;   (and (not (null a)) (not (null b)))))
+;
+;
+; (defun internal-mantissa (a) (car (get-value a)))
+; (defun internal-sign (a) (cdr (get-value a)))
+;
+; (defun error (err))
+;
+;
+; (defun abs (a)
+;   (cond ((integerp a) (make-integer (cons (internal-mantissa a) (nil))))
+;         ((error (quote applying abs to non integer)))))
+;
+; (defun negate (a)
+;   (cond ((integerp a) (make-integer (cons (internal-mantissa a)
+;                                           (not (internal-sign a)))))
+;         ((error (quote applying negate to non integer)))))
+;
+; (defun |0| () (make-integer (cons (nil) (nil))))
+; (defun |1| () (make-integer (cons (t) (nil))))
+; (defun |-1| () (make-integer (cons (t) (t))))
+;
+; (defun zerop (a) (null (internal-matissa a)))
+; (defun positivep (a) (null (internal-sign a)))
+;
+; (defun internal= (am bm)
+;   (cond ((and (null am) (null bm)))
+;         ((or (null am) (null bm)) (nil))
+;         ((internal= (car am) (car bm)))))
+;
+; (defun internal< (am bm)
+;   (cond ((null bm) (nil))
+;         ((null am) (t))
+;         ((internal< (car am) (car bm)))))
+;
+; (defun = (a b) 
+;   (and (internal= (internal-matissa a) (internal-mantissa b))
+;        (equiv (internal-sign a) (internal-sign b))))
+;
+; (defun < (a b)
+;   (cond ((and (positivep a) (positivep b))
+;     (cond ((internal< (internal-matissa a)(internal-matissa b))) ((nil))))
+;           ((and (not (positivep a)) (not (positivep b)))
+;             (cond ((internal< (internal-matissa b)(internal-matissa a))) 
+;               ((nil))))
+;     ((positivep a) (nil))
+;     ((t))));;<
+;
+; (defun > (a b) (not (or (< a b) (= a b))))
+; (defun >= (a b) (not (< a b)))
+; (defun <= (a b) (not (> a b)))
+; (defun /= (a b) (not (= a b)))
+;
+;
+; (defun internal+ (al bl)
+;   (cond ((eq (quote ()) al) bl)
+;         ((internal+ (car al) (cons bl (quote ()))))))
+;
+; (defun internal-reduce-value (val)
+;   (cond
+;         ((or (null (car val)) (null (cdr val))) val)
+;         ((internal-reduce-value (cons (car (car varl)) (car (cdr val)))))))
+;
+;
+; (defun + (a b)
+;   (cond ((zerop a) b)
+;         ((zerop b) a)
+;         ((and (positivep a) (positivep b))
+;           (make-integer (cons (internal+ (internal-mantissa a) (internal-mantissa b))
+;                               (nil))))
+;         ((and (not (positivep a)) (not (positivep b)))
+;          (make-integer (cons (internal+ (internal-mantissa a) (internal-mantissa b))
+;                              (t))))
+;         ((positive a) (cond ((internal< (internal-mantissa b) (internal-mantissa a))
+;                         (make-integer (cons (internal- (internal-mantissa a) (internal-mantissa b))
+;                                             (nil))))
+;         ((internal= (internal-mantissa b) (internal-mantissa a)) (|0|)) 
+;         ((make-integer (cons (internal- (internal-mantissa b) (internal-mantissa a))
+;                              (t))))))
+;         ((cond ((internal< (internal-mantissa a) (internal-mantissa b)) 
+;                  (make-integer (cons (internal- (internal-mantissa b) (internal-mantissa a))
+;                                      (nil))))
+;                ((internal= (internal-mantissa a) (internal-mantissa b)) (|0|))
+;                ((make-integer (cons (internal- (internal-mantissa a) (internal-mantissa b))
+;                                     (t))))))));;+
+;
+;
+; (defun - (a b) (+ a (negate b)))
+;
+; (defun internal* (am bm)
+;   (cond ((null am) am)
+;         ((null bm) bm)
+;         ((null (car am)) bm)
+;         ((null (car bm)) am)
+;         ;; a*b = b+(a-1)*b
+;         ((internal+ bm (internal* (car am) bm)))));;internal*
+;
+; (defun * (a b)
+;   (cond ((zerop a) a)
+;         ((zerop b) b)
+;         ((= (|1|) a) b)
+;         ((= (|1|) b) a)
+;         ((= (|-1|) a) (negate b))
+;         ((= (|-1|) b) (negate a))
+;         ((make-integer (cons (internal* (internal-mantissa a) (internal-mantissa b))
+;                              (not (equiv (internal-sign a) (internal-sign b))))))));;*
