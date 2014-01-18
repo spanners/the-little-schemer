@@ -976,3 +976,36 @@
 ;         ((= (|-1|) b) (negate a))
 ;         ((make-integer (cons (internal* (internal-mantissa a) (internal-mantissa b))
 ;                              (not (equiv (internal-sign a) (internal-sign b))))))));;*
+
+
+; Chapter 7. Friends and Relations
+
+(define set?
+  (lambda (lat)
+    (cond
+      ((null? lat) #t)
+      ((member? (car lat) (cdr lat)) #f)
+      (else (set? (cdr lat))))))
+
+(define makeset
+  (lambda (lat)
+    (cond
+      ((null? lat) (quote ()))
+      ((member? (car lat) (cdr lat)) (makeset (cdr lat)))
+      (else (cons (car lat) (makeset (cdr lat)))))))
+
+(define makeset2
+  (lambda (lat)
+    (cond
+      ((null? lat) (quote ()))
+      (else (cons (car lat)
+		  (makeset (multirember (car lat) (cdr lat))))))))
+
+(define subset?
+  (lambda (set1 set2)
+    (cond ((null? set1) #t)
+	  (else (and (member? (car set1) set2) (subset? (cdr set1) set2))))))
+
+(define eqset?
+  (lambda set1 set2)
+   (and (subset? set1 set2) (subset? set2 set1)))
