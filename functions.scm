@@ -1078,3 +1078,42 @@
       )
     )
   )
+
+(define union
+  (lambda (set1 set2)
+    (cond
+      ((null? set1) set2)
+      ((member? (car set1) set2) 
+       (union (cdr set1) set2))
+      (else (cons (car set1) 
+		  (union (cdr set1) set2))
+	)
+      )
+    )
+  )
+
+(define difference
+  (lambda (set1 set2)
+    (cond
+      ((null? set1) (quote ()))
+      ((member? (car set1) set2)
+       (difference (cdr set1) set2))
+      (else (cons (car set1)
+		  (difference (cdr set1) set2))
+	)
+      )
+    )
+  )
+
+; Hmm... how does this work?
+
+(define intersectall
+  (lambda (l-set)
+    (cond
+      ((null? (cdr l-set)) (car l-set))
+      (else (intersect (car l-set) 
+		       (intersectall (cdr l-set)))
+	)
+      )
+    )
+  )
