@@ -661,7 +661,10 @@
 (define (leftmost L)
   (cond
     ((atom? (car L)) (car L))
-    (else (leftmost (car L)))))
+    (else (leftmost (car L))
+      )
+    )
+  )
 
 ; determines if two S-expressions s1 and s2 are the same
 ; an S-expression is an atom or a (possibly empty) list of S-expressions
@@ -670,7 +673,10 @@
     ((and (atom? s1) (atom? s2))
      (eqan? s1 s2))
     ((or (atom? s1) (atom? s2)) #f)
-    (else (eqlist? s1 s2))))
+    (else (eqlist? s1 s2)
+      )
+    )
+  )
 
 ; determines if two lists l1 and l2 are the same (uses areequal?)
 (define (eqlist? l1 l2)
@@ -679,7 +685,10 @@
     ((or (null? l1) (null? l2)) #f)
     (else
       (and (areequal? (car l1) (car l2))
-	   (eqlist? (cdr l1) (cdr l2))))))
+	   (eqlist? (cdr l1) (cdr l2)))
+      )
+    )
+  )
 
 ; chapter 6
 
@@ -691,7 +700,10 @@
     ((atom? aexp) (number? aexp))
     (else
       (and (numbered? (car aexp))
-	   (numbered? (car (cdr (cdr aexp))))))))
+	   (numbered? (car (cdr (cdr aexp)))))
+      )
+    )
+  )
 
 (define (first-sub-exp aexp)
   (car aexp))
@@ -713,7 +725,10 @@
        (value (second-sub-exp nexp))))
     ((eq? (operator nexp) '^)
     (expt (value (first-sub-exp nexp)) 
-       (value (second-sub-exp nexp))))))
+       (value (second-sub-exp nexp)))
+      )
+    )
+  )
 
 ; THE EIGHTH COMMANDMENT : Use help functions to abstract from representations
 
@@ -723,17 +738,20 @@
 ; So here we define zero to be '()
 (define sero?
   (lambda (n)
-    (null? n)))
+    (null? n))
+  )
 
 ; This is our church numeral successor function
 (define edd1
   (lambda (n)
-    (cons (quote ()) n)))
+    (cons (quote ()) n))
+  )
 
 ; Likewise for subtraction
 (define zub1
   (lambda (n)
-    (cdr n)))
+    (cdr n))
+  )
 
 ; Plus
 (define ples
@@ -741,7 +759,11 @@
     (cond
       ((sero? m) n)
       (else
-	(edd1 (ples n (zub1 m)))))))
+	(edd1 (ples n (zub1 m)))
+	)
+      )
+    )
+  )
 
 ; Q. Recall `lat?`
 ; A.
@@ -985,27 +1007,74 @@
     (cond
       ((null? lat) #t)
       ((member? (car lat) (cdr lat)) #f)
-      (else (set? (cdr lat))))))
+      (else (set? (cdr lat))
+	)
+      )
+    )
+  )
 
 (define makeset
   (lambda (lat)
     (cond
       ((null? lat) (quote ()))
-      ((member? (car lat) (cdr lat)) (makeset (cdr lat)))
-      (else (cons (car lat) (makeset (cdr lat)))))))
+      ((member? (car lat) (cdr lat)) 
+       (makeset (cdr lat)))
+      (else (cons (car lat) 
+		  (makeset (cdr lat)))
+	)
+      )
+    )
+  )
 
 (define makeset2
   (lambda (lat)
     (cond
       ((null? lat) (quote ()))
       (else (cons (car lat)
-		  (makeset (multirember (car lat) (cdr lat))))))))
+		  (makeset 
+		    (multirember (car lat) 
+				 (cdr lat))))
+	)
+      )
+    )
+  )
 
 (define subset?
   (lambda (set1 set2)
-    (cond ((null? set1) #t)
-	  (else (and (member? (car set1) set2) (subset? (cdr set1) set2))))))
+    (cond 
+      ((null? set1) #t)
+      (else (and (member? (car set1) set2) 
+		 (subset? (cdr set1) set2))
+        )
+      )
+    )
+  )
 
 (define eqset?
-  (lambda set1 set2)
-   (and (subset? set1 set2) (subset? set2 set1)))
+  (lambda (set1 set2)
+   (and (subset? set1 set2) (subset? set2 set1))))
+
+(define intersect?
+  (lambda (set1 set2)
+    (cond 
+      ((null? set1) #t)
+      (else (or (member? (car set1) set2)
+		(intersect? (cdr set1) set2))
+	)
+      )
+    )
+
+; See how intersect? and subset? are the same apart from using either AND or OR?
+
+(define intersect
+  (lambda (set1 set2)
+    (cond 
+      ((null? set1) (quote ()))
+      ((member? (car set1) set2) 
+       (cons (car set1) 
+	     (intersect (cdr set1) set2)))
+      (else (intersect (cdr set1) set2)
+	)
+      )
+    )
+  )
