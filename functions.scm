@@ -1110,10 +1110,53 @@
 (define intersectall
   (lambda (l-set)
     (cond
-      ((null? (cdr l-set)) (car l-set))
-      (else (intersect (car l-set) 
-		       (intersectall (cdr l-set)))
+      ((null? (cdr l-set)) (car l-set)) ; if the rest of the list is null, return the first element
+      (else (intersect (car l-set) ; else return the intersection of the first element with... 
+		       (intersectall (cdr l-set))) ; ...the recurred intersection of the rest.
 	)
       )
     )
   )
+
+(define a-pair?
+  (lambda (x)
+    (cond
+      ((null? x) #f)
+      ((atom? x) #f)
+      ((null? (cdr x)) #f)
+      ((null? (cdr (cdr x))) #t)
+      (else #f
+	)
+      )
+    )
+  )
+
+(define first
+  (lambda (p)
+    (cond
+      (else (car p)
+	)
+      )
+    )
+  )
+
+(define second
+  (lambda (p)
+    (cond
+      (else (car (cdr p))
+	)
+      )
+    )
+  )
+
+(define build
+  (lambda (s1 s2)
+    (cond
+      (else (cons s1
+		  (cons s2 (quote ())))
+	)
+      )
+    )
+  )
+
+
