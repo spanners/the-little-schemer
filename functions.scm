@@ -1134,6 +1134,28 @@
 
 (define first car)
 
-(define second (lambda (p) (car (cdr p))))
+(define second (lambda (pair) (car (cdr pair))))
 
 (define build (lambda (s1 s2) (cons s1 (cons s2 (quote ())))))
+
+(define third (lambda (l) (car (cdr (cdr l)))))
+
+(define fun? (lambda (rel) (set? (firsts rel))))
+
+(define revpair (lambda (pair) (build (second pair) (first pair))))
+
+(define revrel 
+  (lambda (rel)
+    (cond 
+      ((null? rel) (quote ()))
+      (else
+	(cons (revpair (car rel))
+	      (revrel (cdr rel)))
+        )
+      )
+    )
+  )
+
+(define one-to-one? 
+  (lambda (rel)
+    (fun? (revrel rel))))
