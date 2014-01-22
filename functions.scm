@@ -1063,6 +1063,7 @@
 	)
       )
     )
+  )
 
 ; See how intersect? and subset? are the same apart from using either AND or OR?
 
@@ -1131,32 +1132,8 @@
     )
   )
 
-(define first
-  (lambda (p)
-    (cond
-      (else (car p)
-	)
-      )
-    )
-  )
+(define first car)
 
-(define second
-  (lambda (p)
-    (cond
-      (else (car (cdr p))
-	)
-      )
-    )
-  )
+(define second (lambda (p) (car (cdr p))))
 
-(define build
-  (lambda (s1 s2)
-    (cond
-      (else (cons s1
-		  (cons s2 (quote ())))
-	)
-      )
-    )
-  )
-
-
+(define build (lambda (s1 s2) (cons s1 (cons s2 (quote ())))))
