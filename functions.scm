@@ -1190,8 +1190,6 @@
     )
   )
 
-; rember-f2 is a function that takes 1 argument, test? and returns a function that compares (using test?) the first instance of a in l and removes it if the test? is #t
-
 (define insert-g
   (lambda (seq)
     (lambda (new old l)
@@ -1227,3 +1225,30 @@
 (define insertL-g (insert-g seqL))
 (define insertR-g (insert-g seqR))
 (define subst-g (insert-g seqsubst))
+
+; The Ninth Commandment: Abstract common patterns with a new function.
+;
+(define atom-to-function
+  (lambda (x)
+    (cond
+      ((eq? x (quote +)) +)
+      ((eq? x (quote *)) *)
+      (else pow
+	)
+      )
+    )
+  )
+
+(define value-g
+  (lambda (nexp)
+    (cond
+      ((atom? nexp) nexp)
+      (else
+	((atom-to-function
+	   (operator nexp))
+	 (value (first-sub-exp nexp))
+	 (value (second-sub-exp nexp)))
+	)
+      )
+    )
+  )
