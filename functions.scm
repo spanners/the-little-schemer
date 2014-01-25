@@ -1159,3 +1159,71 @@
 (define one-to-one? 
   (lambda (rel)
     (fun? (revrel rel))))
+
+;; Chapter 8 -- Lambda the Ultimate
+
+(define rember-f
+  (lambda (test? a l)
+    (cond
+      ((null? l) (quote ()))
+      ((test? (car l) a) (cdr l))
+      (else
+	(cons (car l)
+	      (rember-f test? a (cdr l)))
+	)
+      )
+    )
+  )
+
+(define rember-f2
+  (lambda (test?)
+    (lambda (a l)
+      (cond
+	((null? l) (quote ()))
+	((test? (car l) a) (cdr l))
+	(else
+	  (cons (car l)
+		((rember-f2 test?) a (cdr l)))
+	  )
+	)
+      )
+    )
+  )
+
+; rember-f2 is a function that takes 1 argument, test? and returns a function that compares (using test?) the first instance of a in l and removes it if the test? is #t
+
+(define insert-g
+  (lambda (seq)
+    (lambda (new old l)
+      (cond
+	((null? l) (quote ()))
+	((eq? (car l) old) (seq new old (cdr l)))
+	(else
+	  (cons (car l)
+		((insert-g seq) new old l))
+	  )
+	)
+      )
+    )
+  )
+
+(define seqL
+  (lambda (new old l)
+    (cons new (cons old l))))
+
+(define seqR
+  (lambda (new old l)
+    (cons old (cons new l))))
+
+(define seqrem
+  (lambda (new old l)
+    l))
+
+(define seqsubst
+  (lambda (new old l)
+    (cons new l)))
+
+(define rember-g (lambda (new l) ((insert-g seqrem) #f new l)))
+(define insertL-g (insert-g seqL))
+(define insertR-g (insert-g seqR))
+(define subst-g (insert-g seqsubst))
