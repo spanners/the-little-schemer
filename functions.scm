@@ -1285,4 +1285,45 @@
     )
   )
 
+(define multirember&co
+  (lambda (a lat col)
+    (cond
+      ((null? lat) (col (quote ()) (quote ())))
+      ((eq? (car lat) a)
+       (multirember&co a
+		       (cdr lat)
+		       (lambda (newlat seen)
+			 (col newlat
+			      (cons (car lat) seen)))))
+      (else
+	(multirember&co a
+			(cdr lat)
+			(lambda (newlat seen)
+			  (col (cons (car lat) newlat) 
+			       seen)))
+	)
+      )
+    )
+  )
+
+; lat is (strawberries tuna and swordfish)
+
+; So if we set col to be a-friend and pass it to multirember&co in the call:
+; (multirember&co (quote tuna) (quote (strawberries tuna and swordfish)) a-friend)
+(define a-friend
+  (lambda (x y)
+    (null? y)))
+
+; new-friend is what the first lambda in multirember&co becomes
+(define new-friend
+  (lambda (newlat seen)
+    (a-friend newlat
+	     (cons (quote tuna) seen))))
+
+; and latest-friend is what the second lambda in multirember&co becomes
+(define latest-friend
+  (lambda (newlat seen)
+    (a-friend (cons (quote and) newlat) 
+	      seen)))
+
 
