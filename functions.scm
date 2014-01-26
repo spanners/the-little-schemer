@@ -1252,3 +1252,37 @@
       )
     )
   )
+
+(define multirember-f
+  (lambda (test?)
+    (lambda (a lat)
+      (cond
+	((null? lat) (quote ()))
+	((test? (car lat) a) ((multirember-f test?) a (cdr lat)))
+	(else
+	  (cons (car lat)
+		((multirember-f test?) a (cdr lat)))
+	  )
+	)
+      )
+    )
+  )
+
+(define eq-tuna?
+  (lambda (x)
+    (eq? x (quote tuna))))
+
+(define multiremberT
+  (lambda (test? lat)
+    (cond
+      ((null? lat) (quote ()))
+      ((test? (car lat)) (multiremberT test? (cdr lat)))
+      (else
+	(cons (car lat)
+	      (multiremberT test? (cdr lat)))
+	)
+      )
+    )
+  )
+
+
