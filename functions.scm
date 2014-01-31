@@ -1699,5 +1699,5 @@
 
 (define e1 '(cond (coffee klatsch) (else party)))
 
-(define table2 '(((coffee) (#t)) (klatsch party) (5 (6))))
+(define table2 '(((coffee) (#t)) ((klatsch party) (5 (6)))))
 
