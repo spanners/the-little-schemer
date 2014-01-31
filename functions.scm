@@ -1480,7 +1480,6 @@
   )
 
 ; determines the length of lists that contain 2 or fewer items
-(define two-or-fewer
 (lambda (l)
   (cond
     ((null? l) 0)
@@ -1500,7 +1499,21 @@
 	 (cdr l)))
       )
     )
-  ))
+  )
 
+(define five
+(((lambda (mk-length)
+   (mk-length mk-length))
+ (lambda (mk-length)
+   (lambda (l)
+     (cond
+       ((null? l) 0)
+       (else (add1
+	       ((mk-length mk-length)
+		(cdr l)))))))) '(1 2 3 4 5)))
 
-; P.161
+(define Y
+  (lambda (le)
+    ((lambda (f) (f f))
+     (lambda (f)
+       (le (lambda (x) ((f f) x)))))))
