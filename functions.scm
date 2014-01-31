@@ -1438,4 +1438,69 @@
 
 ; Chapter 9. ...and Again, and Again, and Again,...
 
+(define eternity
+  (lambda (x)
+    (eternity x)))
+
+(define length
+  (lambda (l)
+    (cond
+      ((null? l) 0)
+      (else
+	(add1 (length (cdr l)))
+	)
+      )
+    )
+  )
+
+; determines the length of the empty list
+(lambda (l)
+  (cond
+    ((null? l) 0)
+    (else 
+      (add1 (eternity (cdr l)))
+      )
+    )
+  )
+
+; determines the length of lists that contain 1 or fewer items
+(lambda (l)
+  (cond
+    ((null? l) 0)
+    (else
+      (add1
+	((lambda (l)
+	   (cond
+	     ((null? l) 0)
+	     (else
+	       (add1 (eternity (cdr l))))))
+	 (cdr l)))
+      )
+    )
+  )
+
+; determines the length of lists that contain 2 or fewer items
+(define two-or-fewer
+(lambda (l)
+  (cond
+    ((null? l) 0)
+    (else
+      (add1
+	((lambda (l)
+	   (cond
+	     ((null? l) 0)
+	     (else
+	       (add1
+		 ((lambda (l)
+		   (cond
+		     ((null? l) 0)
+		     (else
+		       (add1 (eternity (cdr l))))))
+		  (cdr l))))))
+	 (cdr l)))
+      )
+    )
+  ))
+
+
 ; P.161
