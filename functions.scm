@@ -1435,3 +1435,7 @@
     (cons sum
 	  (cons product
 		newl))))
+
+; Chapter 9. ...and Again, and Again, and Again,...
+
+; P.161
