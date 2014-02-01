@@ -1715,7 +1715,7 @@
 
 (define *application
   (lambda (e table)
-    (apply
+    (apply-it
       (meaning (function-of e) table)
       (evlis (arguments-of e) table))))
 
@@ -1731,7 +1731,7 @@
   (lambda (l)
     (eq? (first l) (quote non-primitive))))
 
-(define apply
+(define apply-it
   (lambda (fun vals)
     (cond
       ((primitive? fun)
@@ -1753,9 +1753,9 @@
       ((eq? name (quote null?))
        (null? (first vals)))
       ((eq? name (quote eq?))
-       (eq? (first vals)))
+       (eq? (first vals) (second vals)))
       ((eq? name (quote atom?))
-       (atom? (first vals)))
+       (:atom? (first vals)))
       ((eq? name (quote zero?))
        (zero? (first vals)))
       ((eq? name (quote add1))
@@ -1765,4 +1765,44 @@
       ((eq? name (quote number?))
        (number? (first vals))))))
 
+(define :atom?
+  (lambda (x)
+    (cond
+      ((atom? x) #t)
+      ((null? x) #f)
+      ((eq? (car x) (quote primitive))
+       #t)
+      ((eq? (car x) (quote non-primitive))
+       #t)
+      (else
+	#f
+	)
+      )
+    )
+  )
 
+(define apply-closure
+  (lambda (closure vals)
+    (meaning (body-of closure)
+	     (extend-table
+	       (new-entry
+		 (formals-of closure)
+		 vals)
+	       (table-of closure)))))
+
+(define closure1
+  '(
+    (
+     ((u v w)
+      (1 2 3))
+     ((x y z)
+      (4 5 6))
+     )
+    (x y)
+    (cons z x)
+    )
+  )
+
+(define vals1 '((a b c) (d e f)))
+
+; Yes, it's time for a banquet.
